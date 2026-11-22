@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use PaPeR, please cite it as below, together with Huisman (2017), whose parentage approach PaPeR follows."
+type: software
+title: "PaPeR: Parentage Assignment for Microhaplotype and SNP Markers"
+version: 0.1.0
+date-released: 2026-11-22
+license: MIT
+repository-code: "https://github.com/ty-wittman/PaPeR"
+authors:
+  - family-names: Wittman
+    given-names: Tyler
+keywords:
+  - parentage assignment
+  - pedigree reconstruction
+  - microhaplotypes
+  - SNP
+  - R
+references:
+  - type: article
+    title: "Pedigree reconstruction from SNP data: parentage assignment, sibship clustering and beyond"
+    authors:
+      - family-names: Huisman
+        given-names: Jisca
+    journal: "Molecular Ecology Resources"
+    year: 2017
+    volume: 17
+    issue: 5
+    start: 1009
+    end: 1024
+    doi: "10.1111/1755-0998.12665"
+  - type: software
+    title: "sequoia: Pedigree Inference from SNPs"
+    authors:
+      - family-names: Huisman
+        given-names: Jisca
+    url: "https://CRAN.R-project.org/package=sequoia"

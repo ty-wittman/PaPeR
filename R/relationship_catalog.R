@@ -64,7 +64,7 @@
 }
 
 # These are the finite typed-parent configurations represented by the active
-# Complex = "full" registry (see docs/MODEL.md, section 6).  No dummy node, sibship cluster, or reconstruction
+# Complex = "full" registry (see docs/model.md, section 6).  No dummy node, sibship cluster, or reconstruction
 # topology is included here.
 .catalog_topology_catalog <- function() {
   T <- .catalog_topology
