@@ -23,8 +23,9 @@ list with per-parent (dam, sire) counts: assigned, correct, wrong,
 Score an inferred parentage pedigree against the truth
 }
 \examples{
-\dontrun{
-score_pedigree(assign_parents(GenoM, LifeHistData, 0.005, 5e-4), truth,
-               typed_ids = rownames(GenoM))
-}
+ex <- pap_example
+first <- ex$LifeHistData$ID[ex$LifeHistData$BirthYear <= 2016]
+ped <- assign_parents(ex$GenoM[first, ], ex$LifeHistData,
+                      Dropout = 0.005, Foreign = 5e-4)
+str(score_pedigree(ped, ex$Pedigree, typed_ids = first))
 }

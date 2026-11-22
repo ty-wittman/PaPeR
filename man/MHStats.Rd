@@ -56,3 +56,12 @@ adds \code{pseudocount} only to zero-count panel alleles, followed by
 normalization, so likelihood construction does not assign zero probability
 to a retained panel allele.
 }
+\examples{
+st <- MHStats(pap_example$GenoM, warn_Ae = 0)
+head(st$ALL[, c("locus", "n_typed", "call_rate", "n_alleles", "Ae", "PIC")])
+# by cohort
+lh <- pap_example$LifeHistData
+by_year <- MHStats(pap_example$GenoM, by = lh[, c("ID", "BirthYear")],
+                   warn_Ae = 0)
+names(by_year)
+}

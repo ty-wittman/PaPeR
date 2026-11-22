@@ -52,8 +52,7 @@ parent-offspring or siblings in \code{Pedigree}. Useful for spotting missed
 relationships (the analogue of Sequoia's \code{GetMaybeRel}).
 }
 \examples{
-\dontrun{
-ped <- assign_parents(GenoM, LifeHistData, 0.005, 5e-4)
-get_maybe_rel(GenoM, 0.005, 5e-4, Pedigree = ped)
-}
+G <- pap_example$GenoM[1:60, ]
+rel <- get_maybe_rel(G, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
+head(rel[, c("ID1", "ID2", "TopRel", "LLR")])
 }

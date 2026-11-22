@@ -229,6 +229,14 @@
 #'   likelihood-safe frequencies, call rate, observed allele counts, declared
 #'   allele-universe sizes,
 #'   \eqn{A_e=1/\sum p_i^2}, and codominant multiallelic PIC.
+#' @examples
+#' st <- MHStats(pap_example$GenoM, warn_Ae = 0)
+#' head(st$ALL[, c("locus", "n_typed", "call_rate", "n_alleles", "Ae", "PIC")])
+#' # by cohort
+#' lh <- pap_example$LifeHistData
+#' by_year <- MHStats(pap_example$GenoM, by = lh[, c("ID", "BirthYear")],
+#'                    warn_Ae = 0)
+#' names(by_year)
 #' @export
 MHStats <- function(GenoM, n_alleles = NULL, pseudocount = 0.5, by = NULL,
                     strata = NULL, warn_call_rate = 0.20, warn_Ae = 3) {

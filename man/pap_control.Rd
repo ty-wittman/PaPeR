@@ -70,3 +70,8 @@ Returns the complete settings list used by \code{\link{assign_parents}},
 with any supplied values replacing the defaults. Pass the result, or a
 partial named list, as \code{control}.
 }
+\examples{
+names(pap_control())
+s <- pap_control(list(Tassign = 1, MaxAgeParent = 4, verbose = TRUE))
+s[c("Tassign", "MaxAgeParent", "error_calibration")]
+}

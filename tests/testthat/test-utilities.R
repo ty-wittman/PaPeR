@@ -1,21 +1,18 @@
 # Diagnostic utilities: duplicates, CalcOHLLR, and GetMaybeRel.
 
-make_data <- function(seed = 501, nloci = 150) {
-  sim <- file.path("benchmarks", "reservoir", "helpers",
-                   "simulate_microhap.R")
-  source(sim, local = environment())
+# Small on purpose: both utilities scan every pair of individuals.
+make_data <- function(seed = 501, nloci = 60) {
+  # Simulator functions come from helper-simulate.R.
   set.seed(seed)
   freqs <- lapply(sim_allele_freqs(nloci, sample(3:8, nloci, TRUE), 0.7, seed),
                   function(p) (p + 1e-3) / sum(p + 1e-3))
-  ped <- sim_pedigree(60, 4, 90, seed = seed)
+  ped <- sim_pedigree(30, 3, 40, seed = seed)
   Go <- as_public_genotypes(add_errors(drop_genotypes(ped, freqs, seed = seed + 1),
                                        0.008, 0.006, 0.01, seed = seed + 2))
   list(ped = ped, Go = Go, tables = build_tables(freqs, Err = 0.008))
 }
 
 test_that("find_duplicates detects an injected duplicate sample", {
-  skip_on_cran(); skip_if_not(file.exists(file.path(
-    "benchmarks", "reservoir", "helpers", "simulate_microhap.R")))
   d <- make_data(511)
   dupid <- rownames(d$Go)[50]
   Gd <- rbind(d$Go, COPY = d$Go[dupid, ])
@@ -26,8 +23,6 @@ test_that("find_duplicates detects an injected duplicate sample", {
 
 
 test_that("get_maybe_rel flags a hidden parent-offspring link", {
-  skip_on_cran(); skip_if_not(file.exists(file.path(
-    "benchmarks", "reservoir", "helpers", "simulate_microhap.R")))
   d <- make_data(513)
   ph <- d$ped[, c("id", "dam", "sire")]
   hid <- which(!is.na(ph$dam))[1]; truedam <- ph$dam[hid]; foc <- ph$id[hid]

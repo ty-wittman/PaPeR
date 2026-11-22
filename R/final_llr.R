@@ -18,6 +18,17 @@
 #'   and unassigned sides have \code{NA} LLRs. Row order and parent links are
 #'   preserved. Attributes \code{final_llr_evidence}, \code{final_llr_hypotheses}
 #'   and \code{final_llr_unavailable} record the scoring settings and refusals.
+#' @examples
+#' ex <- pap_example
+#' # Score the true pedigree of the first two cohorts, keeping only
+#' # genotyped parents
+#' first <- ex$LifeHistData$ID[ex$LifeHistData$BirthYear <= 2016]
+#' truth <- ex$Pedigree[ex$Pedigree$id %in% first, c("id", "dam", "sire")]
+#' truth$dam[!truth$dam %in% first] <- NA
+#' truth$sire[!truth$sire %in% first] <- NA
+#' scored <- calc_llr(truth, ex$GenoM[first, ], ex$LifeHistData,
+#'                    Dropout = 0.005, Foreign = 5e-4)
+#' summary(scored$LLRdam)
 #' @export
 calc_llr <- function(Pedigree, GenoM, LifeHistData, Dropout = NULL, Foreign = NULL,
                      control = list()) {

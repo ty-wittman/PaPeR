@@ -21,9 +21,10 @@
 #'   base 10. A mismatch compares unordered genotypes at jointly called loci;
 #'   mismatch rate is \code{NA} when none are jointly called.
 #' @examples
-#' \dontrun{
-#' dups <- find_duplicates(GenoM, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
-#' }
+#' G <- pap_example$GenoM[1:60, ]
+#' G <- rbind(G, resampled = G[10, ])   # a second sample of one individual
+#' dups <- find_duplicates(G, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
+#' dups[, c("ID1", "ID2", "LLR", "LLR_MZ_vs_best", "mismatch_rate")]
 #' @export
 find_duplicates <- function(GenoM, Dropout = NULL, Foreign = NULL, thresh = 0,
                             control = list()) {
@@ -121,10 +122,9 @@ find_duplicates <- function(GenoM, Dropout = NULL, Foreign = NULL, thresh = 0,
 #' @return \code{data.frame(ID1, ID2, TopRel, LLR, ...)}, strongest first.
 #'   \code{LLR} is base 10.
 #' @examples
-#' \dontrun{
-#' ped <- assign_parents(GenoM, LifeHistData, 0.005, 5e-4)
-#' get_maybe_rel(GenoM, 0.005, 5e-4, Pedigree = ped)
-#' }
+#' G <- pap_example$GenoM[1:60, ]
+#' rel <- get_maybe_rel(G, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
+#' head(rel[, c("ID1", "ID2", "TopRel", "LLR")])
 #' @export
 get_maybe_rel <- function(GenoM, Dropout = NULL, Foreign = NULL, Pedigree = NULL,
                           LifeHistData = NULL, thresh = 2, exclude_rels = NULL,

@@ -1,22 +1,33 @@
 Package: PaPeR
 Type: Package
-Title: Parentage Assignment for Multiallelic (Microhaplotype) Markers
+Title: Parentage Assignment for Microhaplotype and SNP Markers
 Version: 0.1.0
-Author: PaPeR Authors
-Maintainer: PaPeR Authors <wittman98@gmail.com>
-Description: Assigns dams and sires to genotyped individuals from
-    microhaplotype or SNP genotypes and life-history data. Each parent slot is
-    decided by a likelihood comparison of the assigned parents against
-    alternative relationships (siblings, grandparents, aunts and uncles,
-    half-siblings and others), with genotype messages from already assigned
-    relatives. Error rates use a dropout/foreign model for microhaplotypes or
-    the Sequoia error model for SNPs, and can be calibrated from the confident
-    trios of the inferred pedigree. Sibship clustering and dummy parents are
-    outside its scope.
+Authors@R: c(
+    person("Tyler", "Wittman", email = "wittman98@gmail.com",
+           role = c("aut", "cre", "cph")),
+    person("Claude", role = "ctb",
+           comment = "AI model by Anthropic; co-wrote the code and documentation as a coding assistant"))
+Description: Assigns genotyped dams and sires to genotyped individuals from
+    multiallelic microhaplotype or biallelic SNP genotypes and life-history
+    data. Inspired by the parentage step of 'sequoia' (Huisman 2017,
+    <doi:10.1111/1755-0998.12665>), whose heuristic search and settings it
+    follows, it decides each parent with an exact local pedigree-likelihood
+    comparison of the assigned parents against alternative relationships
+    (siblings, grandparents, aunts and uncles, half-siblings and others),
+    conditioning on the relatives already assigned. Microhaplotype errors use
+    a dropout/foreign model and SNP errors the 'sequoia' model; the error rate
+    is calibrated from the confident trios of the inferred pedigree. Sibship
+    clustering and dummy parents are outside its scope.
 License: MIT + file LICENSE
-Encoding: UTF-8
+URL: https://github.com/ty-wittman/PaPeR
+BugReports: https://github.com/ty-wittman/PaPeR/issues
+Depends: R (>= 4.4.0)
+Imports: Rcpp, stats, utils
 LinkingTo: Rcpp
-Imports: Rcpp, stats
-Suggests: testthat (>= 3.0.0), withr, CKMRsim, sequoia
+Suggests: testthat (>= 3.0.0), withr, knitr, rmarkdown, CKMRsim
+VignetteBuilder: knitr
+SystemRequirements: C++20, GNU make
+Encoding: UTF-8
+LazyData: true
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.1

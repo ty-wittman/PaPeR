@@ -220,9 +220,12 @@ build_locus_table <- function(p, Err = 1e-4, ErrProfile = NULL,
 #'   \code{value_type = "raw_log_likelihood"}); the winning relationship is
 #'   attached as \code{winning_configuration}.
 #' @examples
-#' \dontrun{
-#' calc_pair_LL(GenoM, "A", "B", Dropout = 0.005, Foreign = 5e-4)
-#' }
+#' ex <- pap_example
+#' kid <- "ID0151"
+#' mum <- ex$Pedigree$dam[ex$Pedigree$id == kid]
+#' ll <- calc_pair_LL(ex$GenoM, kid, mum, Dropout = 0.005, Foreign = 5e-4)
+#' attr(ll, "winning_configuration")
+#' round(c(ll) - ll[["U"]], 1)   # natural-log ratios against unrelated
 #' @export
 calc_pair_LL <- function(GenoM, i, j, Dropout = NULL, Foreign = NULL, control = list()) {
   out <- .calc_pair_LL(GenoM, i, j, .pap_utility_tables(GenoM, Dropout, Foreign, control))
@@ -259,9 +262,12 @@ calc_pair_LL <- function(GenoM, i, j, Dropout = NULL, Foreign = NULL, control = 
 #'   dam only), H_0S (the sire only) and H_U (unrelated). Missing calls are
 #'   marginalized exactly. These are raw log-likelihoods, not LLRs.
 #' @examples
-#' \dontrun{
-#' calc_trio_LL(GenoM, "O", "D", "S", Dropout = 0.005, Foreign = 5e-4)
-#' }
+#' ex <- pap_example
+#' kid <- "ID0151"
+#' mum <- ex$Pedigree$dam[ex$Pedigree$id == kid]
+#' dad <- ex$Pedigree$sire[ex$Pedigree$id == kid]
+#' ll <- calc_trio_LL(ex$GenoM, kid, mum, dad, Dropout = 0.005, Foreign = 5e-4)
+#' round(c(ll) - ll[["H_U"]], 1)   # natural-log ratios against no parents
 #' @export
 calc_trio_LL <- function(GenoM, o, d, s, Dropout = NULL, Foreign = NULL, control = list()) {
   out <- .calc_trio_LL(GenoM, o, d, s, .pap_utility_tables(GenoM, Dropout, Foreign, control))

@@ -10,10 +10,11 @@
 #' @return list with per-parent (dam, sire) counts: assigned, correct, wrong,
 #'   missed, precision, recall, and true-null assignment accuracy.
 #' @examples
-#' \dontrun{
-#' score_pedigree(assign_parents(GenoM, LifeHistData, 0.005, 5e-4), truth,
-#'                typed_ids = rownames(GenoM))
-#' }
+#' ex <- pap_example
+#' first <- ex$LifeHistData$ID[ex$LifeHistData$BirthYear <= 2016]
+#' ped <- assign_parents(ex$GenoM[first, ], ex$LifeHistData,
+#'                       Dropout = 0.005, Foreign = 5e-4)
+#' str(score_pedigree(ped, ex$Pedigree, typed_ids = first))
 #' @export
 score_pedigree <- function(inferred, truth, typed_ids = NULL) {
   if (!is.null(typed_ids)) truth <- .typed_truth(truth, typed_ids)

@@ -55,11 +55,23 @@ calibrated from the inferred pedigree (see \code{error_calibration} in
 \code{\link{find_duplicates}}.
 }
 \examples{
-\dontrun{
-ped <- assign_parents(GenoM, LifeHistData, Dropout = 0.005, Foreign = 5e-4)
+ex <- pap_example
+# A quick run on the first two birth cohorts (224 individuals)
+first <- ex$LifeHistData$ID[ex$LifeHistData$BirthYear <= 2016]
+ped <- assign_parents(ex$GenoM[first, ], ex$LifeHistData,
+                      Dropout = 0.005, Foreign = 5e-4)
+head(ped[!is.na(ped$dam), ])
 attr(ped, "calibration")
-# SNPs with Sequoia's error model:
-ped <- assign_parents(GenoM, LifeHistData,
-                      control = list(error_model = "sequoia", Err = 0.005))
+score_pedigree(ped, ex$Pedigree, typed_ids = first)$dam[c("correct", "wrong", "missed")]
+
+\donttest{
+# The whole example population with final LLRs (about a minute)
+ped <- assign_parents(ex$GenoM, ex$LifeHistData, Dropout = 0.005,
+                      Foreign = 5e-4, control = list(CalcLLR = TRUE))
+summary(ped$LLRdam)
+
+# SNPs with Sequoia's error model
+ped_snp <- assign_parents(ex$GenoM_snp, ex$LifeHistData,
+                          control = list(error_model = "sequoia", Err = 0.005))
 }
 }

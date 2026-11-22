@@ -15,9 +15,9 @@ Each scientific call uses one BLAS/OpenMP thread.
 | Pre-screen, support, pair rescue and hypothesis suites | `test-ancestral-prescreen-default.R`, `test-joint-support-gates.R`, `test-pair-rescue.R`, `test-hypothesis-suites.R`, `test-s7-reverse-po.R` |
 | Calibration and fixed Foreign | `test-error-calibration-*.R`, `test-calibration-fixed-foreign.R`, `test-two-pass-error.R`, `test-review-*.R`, `test-confidence-dependency-records.R`, `test-confidence-no-raw.R` |
 | Fixed-pedigree final LLRs and nonmutation | `test-fixed-pedigree-llr.R`, `test-final-llr-enumeration.R` |
-| Duplicate detection | `test-duplicate-report.R` |
+| Duplicate detection and likely relatives | `test-duplicate-report.R`, `test-utilities.R` |
 
 The enumeration test sums latent genotypes on tiny pedigrees and computes the
-emissions independently inside the test. Higher-allele cases remain in the
-production suite and the public-only 164-case driver (`tools/audit_roots.R`).
-Saved-fixture checks use `bench/run.R` and `bench/compare.R`.
+emissions independently inside the test. `helper-simulate.R` simulates the
+pedigrees and genotypes used by the utility tests and by the example data
+(`data-raw/make_example_data.R`).

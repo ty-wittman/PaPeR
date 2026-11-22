@@ -1,3 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
 ^.*\.Rcheck$
 ^scratch$
 \.DS_Store$
+^LICENSE\.md$
+^README\.md$
+^data-raw$
+^docs$
+^tools$
+^\.github$
+^CITATION\.cff$
+^src/.*\.d$

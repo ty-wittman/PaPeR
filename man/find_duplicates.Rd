@@ -46,7 +46,8 @@ confirmed duplicates. A reported pair need not favor MZ over every
 biological relationship.
 }
 \examples{
-\dontrun{
-dups <- find_duplicates(GenoM, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
-}
+G <- pap_example$GenoM[1:60, ]
+G <- rbind(G, resampled = G[10, ])   # a second sample of one individual
+dups <- find_duplicates(G, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
+dups[, c("ID1", "ID2", "LLR", "LLR_MZ_vs_best", "mismatch_rate")]
 }

@@ -36,7 +36,10 @@ Named natural-log likelihoods of the pair under each ordinary
 Relationship log-likelihoods for one pair of individuals
 }
 \examples{
-\dontrun{
-calc_pair_LL(GenoM, "A", "B", Dropout = 0.005, Foreign = 5e-4)
-}
+ex <- pap_example
+kid <- "ID0151"
+mum <- ex$Pedigree$dam[ex$Pedigree$id == kid]
+ll <- calc_pair_LL(ex$GenoM, kid, mum, Dropout = 0.005, Foreign = 5e-4)
+attr(ll, "winning_configuration")
+round(c(ll) - ll[["U"]], 1)   # natural-log ratios against unrelated
 }

@@ -34,7 +34,10 @@ Named natural-log likelihoods: H_PP (both are parents), H_D0 (the
 Parent-pair (trio) log-likelihoods
 }
 \examples{
-\dontrun{
-calc_trio_LL(GenoM, "O", "D", "S", Dropout = 0.005, Foreign = 5e-4)
-}
+ex <- pap_example
+kid <- "ID0151"
+mum <- ex$Pedigree$dam[ex$Pedigree$id == kid]
+dad <- ex$Pedigree$sire[ex$Pedigree$id == kid]
+ll <- calc_trio_LL(ex$GenoM, kid, mum, dad, Dropout = 0.005, Foreign = 5e-4)
+round(c(ll) - ll[["H_U"]], 1)   # natural-log ratios against no parents
 }
