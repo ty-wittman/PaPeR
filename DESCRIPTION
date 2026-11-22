@@ -1,0 +1,22 @@
+Package: PaPeR
+Type: Package
+Title: Parentage Assignment for Multiallelic (Microhaplotype) Markers
+Version: 0.1.0
+Author: PaPeR Authors
+Maintainer: PaPeR Authors <wittman98@gmail.com>
+Description: Assigns dams and sires to genotyped individuals from
+    microhaplotype or SNP genotypes and life-history data. Each parent slot is
+    decided by a likelihood comparison of the assigned parents against
+    alternative relationships (siblings, grandparents, aunts and uncles,
+    half-siblings and others), with genotype messages from already assigned
+    relatives. Error rates use a dropout/foreign model for microhaplotypes or
+    the Sequoia error model for SNPs, and can be calibrated from the confident
+    trios of the inferred pedigree. Sibship clustering and dummy parents are
+    outside its scope.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LinkingTo: Rcpp
+Imports: Rcpp, stats
+Suggests: testthat (>= 3.0.0), withr, CKMRsim, sequoia
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

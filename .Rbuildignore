@@ -1,0 +1,3 @@
+^.*\.Rcheck$
+^scratch$
+\.DS_Store$

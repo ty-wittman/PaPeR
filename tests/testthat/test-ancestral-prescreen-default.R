@@ -1,0 +1,40 @@
+test_that('ancestral defaults select the validated support-only pre-screen',{
+ d<-PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE))
+ expect_identical(d$likelihood_evidence,'ancestral')
+ expect_true(d$pair_rescue);expect_true(d$pair_rescue_support_only)
+ expect_equal(d$pair_rescue_margin_ln,log(100))
+ expect_identical(d$pair_rescue_top_k,10L)
+ expect_false(PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE,likelihood_evidence='full'))$pair_rescue)
+ expect_false(PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE,pair_rescue=FALSE))$pair_rescue)
+ expect_false(PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE,pair_rescue_shadow=TRUE))$pair_rescue)
+ custom<-PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE,pair_rescue_top_k=50L,pair_rescue_margin_ln=Inf))
+ expect_identical(custom$pair_rescue_top_k,50L);expect_identical(custom$pair_rescue_margin_ln,Inf)
+})
+
+test_that('ordinary cold audits report would-accept without changing the final state',{
+ source(test_path('helper-parentage-fixture.R'),local=TRUE)
+ calls<-rbind(A=rep('1/2',60L),D=rep('1/1',60L),S=rep('2/2',60L));colnames(calls)<-paste0('L',1:60)
+ f<-.scientific_fixture(calls,dam_candidates='D',sire_candidates='S',Complex='full',
+  birth_year=c(A=4L,D=2L,S=2L))
+ run<-function(native_defaults=FALSE){
+  i<-f$input;i$pedigree_likelihood<-TRUE;i$likelihood_evidence<-'ancestral';i<-PaPeR:::.engine_defaults(i)
+  if(native_defaults)i[c('pair_rescue','pair_rescue_support_only',
+    'pair_rescue_margin_ln','pair_rescue_top_k')]<-NULL
+  i$pedigree_hypothesis_suite<-'S7';i$configuration_diagnostics<-TRUE;i$configuration_locus_diagnostics<-FALSE
+  i$private_frozen_decision_audit<-TRUE;i$recheck_only<-FALSE;i$diagnostic_visit_order<-1L
+  i$local_conditioning<-i$local_core_only<-TRUE
+  cp<-PaPeR:::build_snapshot_cpp(f$compact_inputs)
+  invisible(PaPeR:::publish_messages_cpp(cp,i$parents,i$start_graph_revision,i$message_revision,1L))
+  z<-PaPeR:::run_parentage_cpp(cp,f$compact_inputs,i)
+  expect_identical(unname(z$final_parents),unname(i$parents))
+  expect_equal(nrow(z$accepted_moves),0L)
+  expect_true(isTRUE(z$frozen_state_audit))
+  expect_equal(z$focal_summary$selected_dam,2L);expect_equal(z$focal_summary$selected_sire,3L)
+  expect_equal(z$focal_summary$accepted,1L)
+  expect_equal(z$focal_summary$graph_revision_before,z$focal_summary$graph_revision_after)
+  z
+ }
+ a<-run();b<-run(TRUE)
+ cols<-c('selected_dam','selected_sire','accepted','rejection_reason','dam_support_ln','sire_support_ln','pair_support_ln','identity_margin_ln')
+ expect_equal(a$focal_summary[cols],b$focal_summary[cols],tolerance=1e-6)
+})
