@@ -1,6 +1,7 @@
 useDynLib(PaPeR, .registration = TRUE)
 importFrom(Rcpp, evalCpp)
 importFrom(stats, setNames)
+importFrom(utils, head, object.size)
 export(assign_parents)
 export(pap_control)
 export(find_duplicates)
