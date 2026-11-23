@@ -1,0 +1,30 @@
+bibentry(
+  bibtype = "Manual",
+  header = "To cite PaPeR in publications, please use:",
+  title = "{PaPeR}: Parentage Assignment for Microhaplotype and {SNP} Markers",
+  author = person("Tyler", "Wittman"),
+  year = "2026",
+  note = paste("R package version", meta$Version),
+  url = "https://github.com/ty-wittman/PaPeR",
+  textVersion = paste0(
+    "Wittman, T. (2026). PaPeR: Parentage Assignment for Microhaplotype and ",
+    "SNP Markers. R package version ", meta$Version, ". ",
+    "https://github.com/ty-wittman/PaPeR")
+)
+
+bibentry(
+  bibtype = "Article",
+  header = "PaPeR follows the parentage approach of Sequoia; please also cite:",
+  title = "Pedigree reconstruction from {SNP} data: parentage assignment, sibship clustering and beyond",
+  author = person("Jisca", "Huisman"),
+  journal = "Molecular Ecology Resources",
+  year = "2017",
+  volume = "17",
+  number = "5",
+  pages = "1009--1024",
+  doi = "10.1111/1755-0998.12665",
+  textVersion = paste0(
+    "Huisman, J. (2017). Pedigree reconstruction from SNP data: parentage ",
+    "assignment, sibship clustering and beyond. Molecular Ecology Resources, ",
+    "17(5), 1009-1024. https://doi.org/10.1111/1755-0998.12665")
+)

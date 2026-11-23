@@ -1,0 +1,249 @@
+---
+title: "Getting started with PaPeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with PaPeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+Sys.setenv(OMP_NUM_THREADS = "1")
+```
+
+PaPeR assigns genotyped parents (a dam and a sire) to genotyped individuals,
+from microhaplotype or SNP genotypes plus each individual's sex and birth year.
+This vignette walks through a full analysis of the simulated example data that
+ships with the package, then shows how to prepare your own data.
+
+PaPeR is inspired by the parentage step of
+[Sequoia](https://CRAN.R-project.org/package=sequoia) (Huisman 2017) and uses
+the same kind of inputs and settings, so Sequoia users will find most of it
+familiar. The last section lists the settings side by side.
+
+```{r setup}
+library(PaPeR)
+```
+
+## The example data
+
+`pap_example` is a simulated population with overlapping generations: 150
+founders born in 2015 and 110 offspring a year from 2016 to 2020. 595 of the
+700 individuals are genotyped, once on 100 microhaplotypes (3 to 8 alleles per
+locus) and once on 150 SNPs. The true pedigree is included so we can check
+the results.
+
+```{r data}
+ex <- pap_example
+dim(ex$GenoM)
+ex$GenoM[1:4, 1:6]
+head(ex$LifeHistData, 4)
+```
+
+Genotypes are character calls `"a/b"`, where `a` and `b` are allele numbers
+`1, 2, ..., k` at that locus and `"0"` marks a missing call. Row names are the
+individual IDs. `LifeHistData` follows Sequoia's format: `ID`, `Sex` (1 female,
+2 male, 3 or `NA` unknown) and `BirthYear`, optionally with `BY.min`, `BY.max`
+and `Year.last`.
+
+## Check the markers
+
+`MHStats()` is the multiallelic counterpart of Sequoia's `SnpStats()`. It
+reports allele frequencies, call rates, the effective number of alleles (`Ae`)
+and the polymorphic information content (PIC) of every locus.
+
+```{r stats}
+st <- MHStats(ex$GenoM, warn_Ae = 0)
+head(st$ALL[, c("locus", "call_rate", "n_alleles", "Ae", "PIC")])
+summary(st$ALL$Ae)
+```
+
+## Check for duplicate samples
+
+PaPeR assumes each individual was sampled once, so remove duplicate samples
+first. `find_duplicates()` scores every pair of samples as "the same
+individual" against unrelated and against close relatives. Here we add a
+second copy of one sample to the first 60 individuals:
+
+```{r duplicates}
+G <- ex$GenoM[1:60, ]
+G <- rbind(G, resampled = G["ID0012", ])
+dups <- find_duplicates(G, Dropout = 0.005, Foreign = 5e-4, thresh = 5)
+dups[, c("ID1", "ID2", "LLR", "LLR_MZ_vs_best", "best_other_relationship",
+         "jointly_called", "mismatch_rate")]
+```
+
+The duplicate is found with a large LLR, and "same individual" beats the best
+alternative (full siblings) by a wide margin. `find_duplicates()` compares every
+pair of samples, so on thousands of samples it takes a while.
+
+## Assign parents
+
+`assign_parents()` takes the genotypes, the life history and two error rates
+for microhaplotypes:
+
+- `Dropout`: the probability that a true heterozygote is called as one of its
+  homozygotes;
+- `Foreign`: the probability that an allele copy is replaced by a random
+  allele from the population.
+
+Starting values are enough. By default PaPeR re-estimates the error rate from
+the confident parent-offspring trios it finds and, if the data show more
+errors than you assumed, raises it and searches again.
+
+```{r assign}
+ped <- assign_parents(ex$GenoM, ex$LifeHistData,
+                      Dropout = 0.005, Foreign = 5e-4,
+                      control = list(CalcLLR = TRUE))
+head(ped[!is.na(ped$dam), c("id", "dam", "sire", "LLRdam", "LLRsire",
+                            "LLRpair", "OHdam", "OHsire", "MEpair")])
+```
+
+The output has one row per genotyped individual. `dam` and `sire` are `NA`
+where no genotyped parent was found. With `CalcLLR = TRUE` it also has
+Sequoia-style columns:
+
+- `LLRdam`, `LLRsire`: base-10 log-likelihood ratio of each assigned parent
+  against the best non-parent relationship, with the other parent kept;
+- `LLRpair`: the weaker of the two when both are assigned;
+- `OHdam`, `OHsire`: opposite homozygotes, loci where parent and offspring
+  share no allele;
+- `MEpair`: Mendelian errors in the trio.
+
+The calibration record shows the error rate used in each search, the rate
+fitted from the confident trios with its 95% interval, and the decision:
+
+```{r calibration}
+attr(ped, "calibration")
+```
+
+Here the supplied dropout rate (0.005) lies inside the fitted interval, so
+PaPeR kept it and needed only one search.
+
+### How good is it?
+
+Because the data are simulated we can compare with the truth.
+`score_pedigree()` counts correct, wrong and missed parents. With `typed_ids`,
+a true parent that was never genotyped counts as "no parent", so assigning
+anyone to that slot counts as wrong.
+
+```{r score}
+sc <- score_pedigree(ped, ex$Pedigree, typed_ids = rownames(ex$GenoM))
+sapply(sc, function(x) unlist(x[c("assigned", "correct", "wrong", "missed")]))
+```
+
+Every genotyped parent is found, and no parent is assigned where the true
+parent was not genotyped.
+
+## SNP data
+
+SNPs use the same genotype format with alleles 1 and 2. For SNP panels you can
+use Sequoia's error model, with a single error rate `Err`:
+
+```{r snp}
+ped_snp <- assign_parents(ex$GenoM_snp, ex$LifeHistData,
+                          control = list(error_model = "sequoia", Err = 0.005))
+sc_snp <- score_pedigree(ped_snp, ex$Pedigree, typed_ids = rownames(ex$GenoM))
+sapply(sc_snp, function(x) unlist(x[c("assigned", "correct", "wrong", "missed")]))
+```
+
+150 SNPs carry less information than 100 microhaplotypes, so a few parents
+are missed and one is wrong. That difference is the reason to use
+microhaplotypes.
+
+## Preparing your own data
+
+### SNPs in Sequoia format
+
+Sequoia stores SNP genotypes as a numeric matrix of 0, 1 and 2 copies, with
+negative numbers for missing calls. PaPeR does not accept numeric matrices,
+because the same numbers could mean allele codes. Convert them first:
+
+```{r convert-snp}
+sequoia_to_pap <- function(G) {
+  out <- matrix("0", nrow(G), ncol(G), dimnames = dimnames(G))
+  ok <- !is.na(G) & G >= 0
+  out[ok] <- c("1/1", "1/2", "2/2")[G[ok] + 1]
+  out
+}
+G012 <- matrix(c(0, 1, 2, -9, 1, 0), nrow = 2,
+               dimnames = list(c("A", "B"), c("snp1", "snp2", "snp3")))
+sequoia_to_pap(G012)
+```
+
+### Microhaplotype allele codes
+
+Allele numbers must run from 1 to the number of alleles at each locus. If your
+genotype caller writes allele names (for example haplotype sequences) or
+larger numbers such as `101/103`, recode each locus first. PaPeR takes the
+largest number it sees as the number of alleles at that locus, so codes in the
+hundreds make huge likelihood tables and a very slow run.
+
+```{r recode}
+recode_alleles <- function(G) {
+  for (l in seq_len(ncol(G))) {
+    called <- G[, l] != "0"
+    ab <- do.call(rbind, strsplit(G[called, l], "/", fixed = TRUE))
+    lev <- sort(unique(as.vector(ab)))
+    a <- match(ab[, 1], lev)
+    b <- match(ab[, 2], lev)
+    G[called, l] <- paste0(pmin(a, b), "/", pmax(a, b))
+  }
+  G
+}
+raw <- matrix(c("101/103", "103/103", "0", "101/214"), ncol = 1,
+              dimnames = list(c("A", "B", "C", "D"), "locus1"))
+cbind(original = raw[, 1], recoded = recode_alleles(raw)[, 1])
+```
+
+### Life history
+
+- Every genotyped individual needs a `BirthYear`, or both `BY.min` and
+  `BY.max` when the exact year is uncertain. Give a range rather than a guess:
+  a wrong exact year can rule out the true parent.
+- Sequoia uses negative numbers for unknown values. Set them to `NA` for
+  PaPeR.
+- IDs must match the genotype row names exactly, so check for stray spaces
+  (`trimws()`) and numbers stored as text.
+
+```{r lifehist, eval = FALSE}
+LH <- LifeHistData
+for (col in intersect(c("BirthYear", "BY.min", "BY.max", "Year.last"), names(LH)))
+  LH[[col]][!is.na(LH[[col]]) & LH[[col]] < 0] <- NA
+LH$ID <- trimws(as.character(LH$ID))
+```
+
+## Settings for Sequoia users
+
+Everything beyond the genotypes, life history and error rates goes in
+`control`; `pap_control()` lists every setting with its default and rejects
+unknown names.
+
+| Sequoia | PaPeR (`control = list(...)`) | Default |
+|---|---|---|
+| `Err` | `error_model = "sequoia", Err = ...` (SNPs) or `Dropout`, `Foreign` arguments | dropout/foreign model |
+| `Tassign` | `Tassign` | 0.5 |
+| `Tfilter` | `Tfilter` | -2 |
+| `args.AP = list(MinAgeParent, MaxAgeParent)` | `MinAgeParent`, `MaxAgeParent` | 1; span of birth years |
+| `CalcLLR` | `CalcLLR` | `FALSE` |
+| (no equivalent) | `error_calibration`: `"raise_guarded"`, `"raise_only"` or `"none"` | `"raise_guarded"` |
+| `SnpStats()` | `MHStats()` | |
+| `GetMaybeRel()` | `get_maybe_rel()` | |
+| `CalcOHLLR()` | `calc_llr()` | |
+| `CalcPairLL()` | `calc_pair_LL()`, `calc_trio_LL()` | |
+
+Sibship clustering and dummy parents (Sequoia's `Module = "ped"`) are outside
+PaPeR's scope: it assigns genotyped parents only.
+
+## Learn more
+
+- `?assign_parents` and `?pap_control` document every argument and setting.
+- The model, error models and calibration are described in `docs/model.md`
+  in the [source repository](https://github.com/ty-wittman/PaPeR).
+
+## Reference
+
+Huisman, J. (2017). Pedigree reconstruction from SNP data: parentage
+assignment, sibship clustering and beyond. *Molecular Ecology Resources*,
+17(5), 1009–1024. <https://doi.org/10.1111/1755-0998.12665>

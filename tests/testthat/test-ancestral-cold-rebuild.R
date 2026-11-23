@@ -1,0 +1,62 @@
+test_that('a loopy ancestral question agrees after a cold rebuild without pieces', {
+ source(test_path('helper-parentage-fixture.R'),local=TRUE)
+ calls<-rbind(G=rep(c('1/2','1/1','1/2'),8),H=rep(c('1/2','2/2','1/2'),8),
+   D=rep(c('1/1','1/2','1/1'),8),S=rep(c('2/2','1/2','2/2'),8),
+   B=rep(c('1/2','1/2','1/2'),8),F=rep(c('1/2','1/2','1/2'),8))
+ colnames(calls)<-paste0('L',1:ncol(calls))
+ # Three full siblings share both typed ancestors, and two mate. This is a
+ # directed acyclic pedigree with several undirected inheritance loops.
+ f<-.scientific_fixture(calls,dam=c(D='G',S='G',B='G',F='D'),
+   sire=c(D='H',S='H',B='H',F='S'),dam_candidates=c('D','B'),sire_candidates='S',
+   focal='F',Complex='full',birth_year=c(G=0L,H=0L,D=2L,S=2L,B=2L,F=4L))
+ q<-f$input;q$pedigree_likelihood<-TRUE;q<-PaPeR:::.engine_defaults(q)
+ q$pedigree_hypothesis_suite<-'S7';q$likelihood_refresh<-3L
+ q$local_conditioning<-q$local_core_only<-TRUE
+ q$configuration_diagnostics<-TRUE;q$configuration_locus_diagnostics<-FALSE
+ q$private_frozen_decision_audit<-TRUE;q$recheck_only<-TRUE
+ q$recheck_focals<-q$diagnostic_visit_order<-6L
+ q$focal_start_position<-q$focal_end_position<-1L
+ run<-function(cold,history=FALSE,prune=TRUE){
+  i<-q;i$likelihood_barren_pruning<-prune;i$likelihood_keep_ancestral_unit_pairs<-!prune
+  if(history){
+   children<-which(rowSums(i$parents)>0L);n<-length(children)
+   i$likelihood_replay_initial_parents<-matrix(0L,nrow(i$parents),2L)
+   i$likelihood_replay_moves<-cbind(as.integer(children),0L,0L,i$parents[children,,drop=FALSE],seq_len(n)-1L,seq_len(n))
+   storage.mode(i$likelihood_replay_moves)<-"integer"
+   i$start_graph_revision<-i$message_revision<-as.integer(n)
+  }
+  if(cold){i$likelihood_no_pieces<-TRUE;i$likelihood_no_program_registry<-TRUE
+    i$pedigree_likelihood_reuse<-FALSE
+    i$pedigree_visit_reuse<-i$pedigree_cross_visit_reuse<-FALSE}
+  cp<-PaPeR:::build_snapshot_cpp(f$compact_inputs)
+  invisible(PaPeR:::publish_messages_cpp(cp,i$parents,
+    i$start_graph_revision,i$message_revision,1L))
+  z<-PaPeR:::run_parentage_cpp(cp,f$compact_inputs,i)
+  expect_identical(unname(z$final_parents),unname(q$parents))
+  expect_equal(nrow(z$accepted_moves),0L)
+  z
+ }
+ recorded<-run(FALSE);cold<-run(TRUE)
+ decisions<-c('selected_dam','selected_sire','accepted','rejection_reason')
+ expect_identical(cold$focal_summary[,decisions],recorded$focal_summary[,decisions])
+ project<-function(z){d<-as.data.frame(z$configuration_diagnostics)
+   d[order(d$dam,d$sire),c('dam','sire','eligible','is_selected','objective_ln',
+     'dam_support_ln','sire_support_ln','pair_support_ln','full_relationship_ln',
+     'full_dam_relationship_ln','full_sire_relationship_ln','identity_objective_ln','identity_margin_ln')]}
+ expect_equal(project(cold),project(recorded),tolerance=1e-6)
+ # Repeat from another fresh snapshot: neither call borrows the previous owner.
+ expect_equal(project(run(TRUE)),project(cold),tolerance=1e-6)
+ unpruned<-run(TRUE,prune=FALSE)
+ expect_equal(project(unpruned),project(cold),tolerance=1e-6)
+ expect_identical(unpruned$focal_summary[,decisions],cold$focal_summary[,decisions])
+ expect_equal(unname(cold$likelihood_ancestral_scope['descendant_observation_ports_after']),0)
+ historical<-run(FALSE,TRUE)
+ expect_equal(project(historical),project(cold),tolerance=1e-6)
+ expect_identical(historical$focal_summary[,decisions],cold$focal_summary[,decisions])
+ expect_false(PaPeR:::.engine_defaults(list(pedigree_likelihood=TRUE))$likelihood_ancestral_reference)
+ q$configuration_diagnostics<-FALSE
+ quiet_history<-run(FALSE,TRUE);quiet_cold<-run(TRUE)
+ quiet_fields<-c(decisions,grep('_ln$',names(quiet_cold$focal_summary),value=TRUE))
+ expect_equal(quiet_history$focal_summary[,quiet_fields],quiet_cold$focal_summary[,quiet_fields],tolerance=1e-6)
+ expect_equal(unname(cold$likelihood_availability['unavailable_hypothesis_locus_cells']),0)
+})

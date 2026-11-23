@@ -1,0 +1,5 @@
+CXX_STD = CXX20
+
+# Incremental development builds use -MMD -MP; rebuild header dependents.
+all: $(SHLIB)
+-include $(wildcard *.d)
