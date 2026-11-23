@@ -1,2 +1,2 @@
 # PaPeR
-Microhaplotype/ multi allelic loci based parentage and pedigree reconstruction R package
+Parentage and Pedigree Reconstruction using microhaplotypes in R 
