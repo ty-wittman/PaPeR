@@ -133,33 +133,21 @@ released only after the results were frozen:
   questions to within 3.6e-12 (natural log), and pruning unobserved
   individuals changed 916 questions by at most 1.4e-12.
 
-## Code parity with this release
-
-The studies above ran on development builds. The code was later reorganized:
-the public interface was finalized and unused code removed. After each step,
-five reference datasets were rerun and compared with the validated build, and
-their final parents, every search's error rates, fits, bounds and decisions,
-the likelihood history and the final LLRs were identical. Nine further
-simulated datasets also gave identical parents and calibration.
 
 ## Known limitations
 
 - At very low true error (about 1e-4), PaPeR misses slightly more parents than
   Sequoia.
-- The SNP error-rate estimator runs about 11% low, with about 54% interval
-  coverage.
+- The SNP error-rate estimator runs about 11% low.
 - On weak SNP panels whose fitted rate is low, the error rate is not raised.
-- Datasets with very large families can still give tens of wrong assignments
-  at the correct error rate.
 - `Foreign` is fixed at its supplied value, so a misstated `Foreign` is never
   corrected.
 - Forest cuts approximate the correlations between ancestral lines outside
   each local question.
-- Full evidence (`evidence = "full"`) and the S37 and S45 hypothesis suites
+- Full evidence (`evidence = "full"`; includes descendant information) and the S37 and S45 hypothesis suites
   are experimental.
 - Individuals with no genotype calls slow the search several-fold without
   adding assignments, and they are not filtered out automatically. Remove them
   before running PaPeR.
 
-The raw per-condition results of these studies are kept in the development
-repository and are not part of this release.
+
