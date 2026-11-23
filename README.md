@@ -7,18 +7,17 @@
 ![R >= 4.4](https://img.shields.io/badge/R-%E2%89%A5%204.4-276DC3.svg)
 ![Version 0.1.0](https://img.shields.io/badge/version-0.1.0-informational.svg)
 
-PaPeR finds the genotyped mother (dam) and father (sire) of each genotyped
+PaPeR finds the genotyped dam and/or sire of genotyped
 individual in a population, using multiallelic microhaplotype or biallelic
 SNP genotypes plus each individual's sex and birth year. It handles
-overlapping generations, unsampled parents and genotyping error, and reports
-how strongly the data support every assigned parent.
+overlapping generations, unsampled parents and genotyping error.
 
 PaPeR is inspired by **[Sequoia](https://CRAN.R-project.org/package=sequoia)**,
 Jisca Huisman's pedigree reconstruction package ([Huisman
 2017](https://doi.org/10.1111/1755-0998.12665)), and follows its heuristic
 approach to parentage. It extends that approach to microhaplotypes: a
 microhaplotype locus carries several alleles and much more information than a
-single SNP, and Sequoia models biallelic SNPs only. See
+single SNP. See
 [Relationship to Sequoia](#relationship-to-sequoia) for what is shared and
 what differs.
 
@@ -115,7 +114,7 @@ calibration, final LLRs and how to prepare your own data.
 |---|---|
 | `GenoM` | Character matrix, one row per individual (row names are IDs) and one column per locus. Calls are `"a/b"` with alleles numbered `1..k` at each locus; `"0"` is missing. SNPs use alleles 1 and 2. |
 | `LifeHistData` | Data frame with `ID`, `Sex` (1 female, 2 male, 3 or `NA` unknown) and `BirthYear`; optionally `BY.min`, `BY.max` for uncertain birth years and `Year.last`. As in Sequoia. |
-| `Dropout`, `Foreign` | Microhaplotype error rates: the chance that a true heterozygote is called as a homozygote, and the chance that an allele copy is replaced by a random allele. Starting values are enough. |
+| `Dropout`, `Foreign` | Microhaplotype error rates: the chance that a true heterozygote is called as a homozygote, and the chance that an allele copy is replaced by a random allele. Starting values are enough. Foreign should be a tiny positive number |
 | `control` | Every other setting; `pap_control()` lists them with their defaults. |
 
 Before running PaPeR on your own data:
@@ -147,15 +146,13 @@ heuristic approach to parentage:
 - the search proceeds in rounds over the genotyped individuals, assigning
   parents greedily and building on earlier assignments;
 - each parent is accepted only if parent–offspring beats the alternative
-  relationships by a likelihood-ratio threshold (`Tassign`, 0.5 on the
-  base-10 scale);
+  relationships by a likelihood-ratio threshold;
 - candidates are screened beforehand by sex, age, opposite homozygotes and a
-  quick unconditional test (`Tfilter`, −2);
+  quick unconditional test;
 - birth years and their ranges limit which individuals can be parents.
 
-It also uses Sequoia's input formats, setting names and output columns, and
-offers Sequoia's SNP error model. Anyone used to Sequoia should be able to
-run PaPeR with little relearning.
+It also uses many of Sequoia's input formats, setting names and output columns, and
+offers Sequoia's SNP error model as an option when using SNPs. Anyone used to Sequoia should be able to run PaPeR with little relearning.
 
 **How PaPeR differs.** The likelihood machinery is new:
 
@@ -172,16 +169,10 @@ run PaPeR with little relearning.
 - **Error-rate calibration.** PaPeR fits the error rate from the
   Mendelian inconsistencies of confident trios and, when needed, raises it and
   restarts the search. Sequoia uses the error rate you supply.
-- **Ages are hard limits.** Birth years set the minimum and maximum parent
-  age (`MinAgeParent`, `MaxAgeParent`). Sequoia instead weights relationships
-  with an age prior.
-- **Parentage only.** Sequoia also clusters half- and full-sibling groups and
-  adds dummy parents for unsampled ones. PaPeR assigns genotyped parents only;
-  for full pedigree reconstruction from SNPs, use Sequoia.
+- **Parentage only.** Currently PaPeR only assigned genotype parents to genotyped offspring, full      pedigree reconstruction is in active development but not yet complete or released.
 
 PaPeR is an independent implementation in R and C++ and contains no Sequoia
-code. If you use PaPeR, please cite Huisman (2017) as well, for the approach
-PaPeR builds on.
+code.
 
 **Settings side by side**
 
@@ -219,7 +210,7 @@ flowchart LR
    are scored. A parent is accepted when its configuration has the highest
    likelihood and beats every alternative relationship by `Tassign`. Accepted
    parents immediately become part of the pedigree that later decisions
-   condition on. Rounds repeat until nothing changes.
+   condition on. Rounds repeat until nothing changes. Parent pairs are reopened and rechecked at the    first fixed point.
 4. **Calibration.** The error rate is fitted from the confident trios. If the
    supplied rate is too low, it is raised and the search restarts from
    scratch; a rate far too high is lowered once. There are at most four
@@ -258,27 +249,25 @@ error rate, PaPeR missed 2–6 more parents (at worst 6 of 814).
 
 This comparison mostly shows what microhaplotypes add. To compare the
 methods on the same data, both programs ran on the SNPs of 20 blind-test
-datasets (before error calibration was added to PaPeR). PaPeR found 14,656
+datasets (before error calibration was added to PaPeR, needs to be redone). PaPeR found 14,656
 correct, 54 wrong and 1,427 missed parents, against Sequoia's 14,728, 69 and
 1,350: 0.5% fewer correct parents and 22% fewer wrong ones.
 
-PaPeR is slower than Sequoia, because every decision is an exact local
-likelihood calculation. On 600 individuals one run took 20 s against
-Sequoia's 3 s, and on 2,000 individuals 102 s against 29 s.
+PaPeR is generally slower than Sequoia (1-5x depending on size), because every decision is an exact local
+likelihood calculation.
 
 Details, provenance and known limitations are in
 [docs/validation.md](docs/validation.md).
 
 ## Scope and limitations
 
-- PaPeR assigns **genotyped** parents only. It does not cluster sibships,
-  create dummy parents or infer unsampled mates.
-- Loci are assumed to be unlinked, and error rates are the same for every
-  locus.
+- Currently PaPeR assigns **genotyped** parents only, it does not cluster sibships,
+  create dummy parents or infer unsampled mates yet. This is future work.
+- Loci are assumed to be unlinked, and error rates are uniform across
+  loci.
 - At very low true error rates (about 1e-4) PaPeR misses slightly more
   parents than Sequoia.
-- The error-rate estimate from SNP data runs about 11% low, and its 95%
-  interval contains the true rate only about half the time. The `Foreign`
+- When estimated on SNPs the  error-rate is about 10% low. The `Foreign`
   rate is never re-estimated.
 - `find_duplicates()` and `get_maybe_rel()` compare every pair of
   individuals, so they are slow on thousands of samples.
@@ -298,22 +287,19 @@ Details, provenance and known limitations are in
 
 If you use PaPeR, please cite it together with Sequoia:
 
-> Wittman, T. (2026). *PaPeR: Parentage assignment for microhaplotype and SNP
+> Wittman, T. (2026). *PaPeR: Parentage and Pedigree Reconstruction using multi allelic
 > markers*. R package version 0.1.0. <https://github.com/ty-wittman/PaPeR>
 
 > Huisman, J. (2017). Pedigree reconstruction from SNP data: parentage
 > assignment, sibship clustering and beyond. *Molecular Ecology Resources*,
 > 17(5), 1009–1024. <https://doi.org/10.1111/1755-0998.12665>
 
-`citation("PaPeR")` prints both.
 
 ## Authorship and AI assistance
 
-PaPeR was written by Tyler Wittman together with Claude, an AI model made by
-Anthropic, used as a coding assistant. The author set the scientific goals,
-made the modelling and design decisions, directed and reviewed the work, and
-ran the validation studies. Much of the code, tests and documentation,
-including this README, was drafted by Claude under that direction. The
+PaPeR was written by Tyler Wittman together with AI (Claude, OpenAI) coding and documentation assistance. The author set the scientific goals,
+made the modelling, design, and scientific decisions, directed and reviewed the work, and
+designed and performed the validation studies. Much of the code, tests and documentation were written using AI and reviewed by the author. The
 package's [DESCRIPTION](DESCRIPTION) file lists Claude as a contributor.
 
 ## License
