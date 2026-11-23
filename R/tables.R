@@ -213,12 +213,16 @@ build_locus_table <- function(p, Err = 1e-4, ErrProfile = NULL,
 #'
 #' @inheritParams find_duplicates
 #' @param i,j individual IDs (character) or 1-based row indices of \code{GenoM}.
-#' @return Named natural-log likelihoods of the pair under each ordinary
-#'   relationship (PO, FS, HS, GP, FA, HA, U, ...). Missing calls are
-#'   marginalized; fully missing loci contribute zero. These are raw
-#'   log-likelihoods, not LLRs (attributes \code{log_base = "e"} and
-#'   \code{value_type = "raw_log_likelihood"}); the winning relationship is
-#'   attached as \code{winning_configuration}.
+#' @return Named natural-log likelihoods of the pair: \code{U} (unrelated),
+#'   \code{PO}, \code{FS}, \code{DEG2} (second degree: half siblings,
+#'   grandparent or full avuncular, which a pair's genotypes cannot tell
+#'   apart), \code{HA} (half avuncular) and \code{MZ} (the same individual).
+#'   Missing calls are marginalized; fully missing loci contribute zero. These
+#'   are raw log-likelihoods, not LLRs (attributes \code{log_base = "e"} and
+#'   \code{value_type = "raw_log_likelihood"}). The attribute
+#'   \code{configuration_likelihoods} gives the same values labelled by
+#'   relationship (U, PO, FS, HS, GP, FA, HA), and
+#'   \code{winning_configuration} names the most likely one.
 #' @examples
 #' ex <- pap_example
 #' kid <- "ID0151"

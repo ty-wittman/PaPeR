@@ -25,12 +25,16 @@ never changes it.}
 \code{frequencies}, \code{n_alleles}, \code{ForeignQ}).}
 }
 \value{
-Named natural-log likelihoods of the pair under each ordinary
-  relationship (PO, FS, HS, GP, FA, HA, U, ...). Missing calls are
-  marginalized; fully missing loci contribute zero. These are raw
-  log-likelihoods, not LLRs (attributes \code{log_base = "e"} and
-  \code{value_type = "raw_log_likelihood"}); the winning relationship is
-  attached as \code{winning_configuration}.
+Named natural-log likelihoods of the pair: \code{U} (unrelated),
+  \code{PO}, \code{FS}, \code{DEG2} (second degree: half siblings,
+  grandparent or full avuncular, which a pair's genotypes cannot tell
+  apart), \code{HA} (half avuncular) and \code{MZ} (the same individual).
+  Missing calls are marginalized; fully missing loci contribute zero. These
+  are raw log-likelihoods, not LLRs (attributes \code{log_base = "e"} and
+  \code{value_type = "raw_log_likelihood"}). The attribute
+  \code{configuration_likelihoods} gives the same values labelled by
+  relationship (U, PO, FS, HS, GP, FA, HA), and
+  \code{winning_configuration} names the most likely one.
 }
 \description{
 Relationship log-likelihoods for one pair of individuals

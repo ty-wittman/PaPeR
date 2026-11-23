@@ -106,10 +106,15 @@ pedigree:
 - within a family, incidences come in the order dam, sire, children ascending.
 
 Union-find admits an incidence unless it would close a cycle; the rest are cut.
-Messages across a cut treat the two sides as independent, which is the one
-approximation outside the local region. Cuts depend only on the current
-pedigree, not on search history. Every accepted move rebuilds the forest and
-invalidates the affected messages.
+Messages across a cut treat the two sides as independent, and the evidence
+that would have crossed the cut is lost: a cut parent incidence makes the
+family treat that parent as unknown (population gametes), and a cut child
+incidence makes the child a founder. This is the one approximation outside the
+local region; a pedigree without loops has no cuts, and its messages are
+exact. Cuts depend only on the current pedigree, not on search history. After
+an accepted move the forest is rebuilt at the next visit, and only the moved
+child and its descendants have their messages invalidated (every message, if
+the set of cuts changed). Messages are recomputed lazily, on first use.
 
 ## 5. The local question
 
@@ -120,6 +125,8 @@ Either *d* or *s* may be absent.
 
 - the genotypes of *f*, *d* and *s*;
 - their assigned parents and grandparents (depth 2);
+- the forest paths (Steiner paths) that connect these individuals, so loops
+  among them stay exact;
 - any latent individuals a rival hypothesis needs, such as the unobserved
   shared parent of half-siblings.
 
@@ -136,7 +143,10 @@ descendants and collateral relatives of the named individuals, and every other
 candidate.
 
 The question is contracted exactly, per locus, by variable elimination. Loops
-inside the local region are therefore exact. Two simplifications are made, and
+inside the local region are therefore exact. One exception: identity questions
+read the current births of explicit individuals from the stored messages even
+when the forest cut them, so that every configuration of a visit sees the same
+cuts; relationship questions keep cut births explicit and exact. Two simplifications are made, and
 neither changes the likelihood:
 
 - unobserved leaves with no evidence below them sum to one and are pruned
@@ -164,7 +174,7 @@ I(c) = ln P(E_c | c) − ln P(E_c | focal unrelated to d and s),     I(0,0) = 0
 own ancestry and any relationship between them; only the focal's proposed
 links are removed. Another candidate's data never enters *I(c)*. The chooser
 takes the configuration with the highest identity. It must beat the best
-configuration with a different parent identity by `margin` (base 10).
+competing configuration by `margin` (base 10).
 
 **Support.** A new parent must have positive support beyond `Tassign`:
 
@@ -192,22 +202,25 @@ evidence. The S7 rivals are:
 Each rival is an explicit topology with its latent individuals. The parent must
 beat the best rival by more than `Tassign_ln`. Age, sex, role and cycle
 constraints decide which rivals are admitted. S37 and S45 add compound
-relationships and are opt-in experiments. In S37 the half-sibling plus
+relationships and are opt-in experiments; neither includes the reverse
+parent-offspring rivals. In S37 the half-sibling plus
 parent-offspring numerator requires both endpoints to have no assigned parents;
 parent forms enter the parent numerator, never a nonparent rival.
 
 **Screens before scoring:**
 
-- **Opposite homozygotes.** Opposite-homozygote counts are bounded by `T`, and
+- **Opposite homozygotes.** Counts of allele-disjoint loci (both called, no
+  allele in common; for SNPs, opposite homozygotes) are bounded by `T`, and
   Mendelian-error counts in trios by `MaxMendelE`. Both are calibrated from
   the tables so that a true parent passes with retention 0.9999^(1/N).
 - **Tfilter.** An unconditional pedigree-free parent-offspring versus unrelated
-  LLR must exceed `Tfilter` (default −2).
+  LLR must be at least `Tfilter` (default −2).
 - **Shortlist.** At most 50 candidates are kept per side.
 - **Pre-screen.** Candidates are ranked by single-parent identity *I(d,0)* or
-  *I(0,s)*. Up to `prescreen_K` (10) per side within `prescreen_margin_ln`
-  (ln 100) below `Tassign_ln` are kept. Pair rescue then checks the winner
-  against omitted pairs that share one parent.
+  *I(0,s)*, and the best `prescreen_K` (10) per side are kept, together with
+  the incumbents. A pair is proposed only if both of its parents are kept and
+  at least one is within `prescreen_margin_ln` (ln 100) of `Tassign_ln`. Pair
+  rescue then checks the winner against omitted pairs that share one parent.
 - **Ages.** Birth years, or BY.min/BY.max intervals, must make every
   parent–child link feasible. Typed intervals propagate through assigned links.
 
@@ -226,8 +239,9 @@ deterministic order:
 ## 8. Error calibration (`raise_guarded`)
 
 1. Run the search at the supplied rates.
-2. Take the complete trios whose decision margins clear `Tassign` (and
-   `margin`) by an extra one unit (base 10). These are the confident trios.
+2. Take the complete trios whose identity margin and relationship contrast
+   clear `margin` and `Tassign` by an extra unit (base 10), and whose three
+   supports clear `Tassign`. These are the confident trios.
 3. Fit the error rate to their Mendelian-inconsistency counts:
    - each called locus of trio *j* is inconsistent with a probability that
      depends on the rate;

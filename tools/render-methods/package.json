@@ -1,0 +1,11 @@
+{
+  "name": "paper-methods-render",
+  "private": true,
+  "description": "Renders docs/methods/PaPeR-methods.md to PDF (see render.sh).",
+  "dependencies": {
+    "@fontsource/source-sans-3": "5.0.12",
+    "@fontsource/stix-two-text": "5.0.13",
+    "katex": "0.16.11",
+    "playwright": "1.63.0"
+  }
+}

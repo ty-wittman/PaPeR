@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="430" viewBox="0 0 760 430" font-family="STIX Two Text, Times New Roman, serif" font-size="14" fill="#222">
+<rect width="760" height="430" fill="#ffffff"/>
+<g transform="translate(0,0)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#f7f9fc" stroke="#e1e4e8"/>
+<line x1="95" y1="72" x2="95" y2="138" stroke="#444" stroke-width="1.4"/>
+<circle cx="95" cy="60" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="73" y="65" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<path d="M95,136 L109,150 L95,164 L81,150 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="117" y="155" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Parent (PO)</text>
+</g>
+<g transform="translate(190,0)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="75" y1="72" x2="75" y2="138" stroke="#444" stroke-width="1.4"/>
+<circle cx="75" cy="60" r="12" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<path d="M75,136 L89,150 L75,164 L61,150 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="97" y="155" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<circle cx="145" cy="105" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="145" y="135" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Unrelated ×1</text>
+</g>
+<g transform="translate(380,0)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="65" y1="67" x2="55" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="65" y1="67" x2="135" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="125" y1="67" x2="55" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="125" y1="67" x2="135" y2="138" stroke="#444" stroke-width="1.4"/>
+<circle cx="65" cy="55" r="12" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="113" y="43" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<circle cx="55" cy="150" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="33" y="155" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<path d="M135,136 L149,150 L135,164 L121,150 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="157" y="155" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Full sibling ×1</text>
+</g>
+<g transform="translate(570,0)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="95" y1="67" x2="55" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="95" y1="67" x2="135" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="30" y1="87" x2="55" y2="138" stroke="#444" stroke-width="1.4"/>
+<line x1="160" y1="87" x2="135" y2="138" stroke="#444" stroke-width="1.4"/>
+<circle cx="95" cy="55" r="12" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="18" y="63" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="148" y="63" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<circle cx="55" cy="150" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="33" y="155" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<path d="M135,136 L149,150 L135,164 L121,150 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="157" y="155" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Half sibling ×2</text>
+</g>
+<g transform="translate(0,215)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="95" y1="57" x2="95" y2="93" stroke="#444" stroke-width="1.4"/>
+<line x1="95" y1="117" x2="95" y2="153" stroke="#444" stroke-width="1.4"/>
+<circle cx="95" cy="45" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="73" y="50" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<rect x="83" y="93" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<path d="M95,151 L109,165 L95,179 L81,165 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="117" y="170" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Grandparent ×8</text>
+</g>
+<g transform="translate(190,215)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="65" y1="52" x2="50" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="65" y1="52" x2="140" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="125" y1="52" x2="50" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="125" y1="52" x2="140" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="140" y1="122" x2="140" y2="160" stroke="#444" stroke-width="1.4"/>
+<circle cx="65" cy="40" r="12" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="113" y="28" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<circle cx="50" cy="110" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="28" y="115" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<rect x="128" y="98" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<path d="M140,158 L154,172 L140,186 L126,172 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="162" y="177" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Full avuncular ×4</text>
+</g>
+<g transform="translate(380,215)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="95" y1="52" x2="55" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="95" y1="52" x2="135" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="28" y1="72" x2="55" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="162" y1="72" x2="135" y2="98" stroke="#444" stroke-width="1.4"/>
+<line x1="135" y1="122" x2="135" y2="160" stroke="#444" stroke-width="1.4"/>
+<circle cx="95" cy="40" r="12" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="16" y="48" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<rect x="150" y="48" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<circle cx="55" cy="110" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="33" y="115" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<rect x="123" y="98" width="24" height="24" fill="#ffffff" stroke="#888888" stroke-width="1.4" stroke-dasharray="4 3"/>
+<path d="M135,158 L149,172 L135,186 L121,172 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="157" y="177" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Half avuncular ×8</text>
+</g>
+<g transform="translate(570,215)">
+<rect x="6" y="6" width="178" height="199" rx="6" fill="#ffffff" stroke="#e1e4e8"/>
+<line x1="95" y1="72" x2="95" y2="138" stroke="#444" stroke-width="1.4"/>
+<path d="M95,46 L109,60 L95,74 L81,60 z" fill="#dbe9f6" stroke="#1b4f8a" stroke-width="1.7"/>
+<text x="117" y="65" font-size="14" text-anchor="middle" fill="#1b4f8a">F</text>
+<circle cx="95" cy="150" r="12" fill="#fde7c8" stroke="#b26b00" stroke-width="1.7"/>
+<text x="73" y="155" font-size="14" text-anchor="middle" fill="#b26b00">C</text>
+<text x="95.0" y="195" font-size="14" text-anchor="middle" fill="#222">Offspring ×2</text>
+</g>
+</svg>

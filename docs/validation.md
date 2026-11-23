@@ -126,8 +126,11 @@ released only after the results were frozen:
   unrelated, parent–offspring, full-sibling, second-degree, half-avuncular and
   duplicate relationships (`tests/testthat/test-core.R`, run when CKMRsim is
   installed).
-- Rebuilding all evidence from scratch reproduces the cached values: 2,674
-  questions agreed to within 3.6e-12 (natural log), and pruning unobserved
+- A looped-pedigree test checks that incrementally updated, rebuilt,
+  unpruned and move-by-move replayed evaluations agree
+  (`tests/testthat/test-ancestral-cold-rebuild.R`). During development,
+  rebuilding all evidence from scratch reproduced the cached values for 2,674
+  questions to within 3.6e-12 (natural log), and pruning unobserved
   individuals changed 916 questions by at most 1.4e-12.
 
 ## Code parity with this release

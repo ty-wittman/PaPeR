@@ -228,7 +228,8 @@ flowchart LR
    pedigree.
 
 The full model, with the likelihoods, messages, decision rules and
-calibration, is in [docs/model.md](docs/model.md). The code layout is in
+calibration, is in [docs/model.md](docs/model.md), and the
+[methods paper](docs/methods/PaPeR-methods.md) explains it in depth. The code layout is in
 [docs/architecture.md](docs/architecture.md).
 
 ## Validation
@@ -286,6 +287,10 @@ Details, provenance and known limitations are in
 
 ## Documentation
 
+- [**Methods paper**](docs/methods/PaPeR-methods.md) ([PDF](docs/methods/PaPeR-methods.pdf)):
+  a standalone technical report on the likelihoods, the pedigree graph and its
+  forest cuts, message passing, and the genotype and allele coding that make
+  exact local likelihoods fast, with references.
 - `vignette("PaPeR")`: getting started.
 - `?assign_parents`, `?pap_control` and the other help pages (`?PaPeR` lists
   them all).

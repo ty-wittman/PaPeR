@@ -128,10 +128,10 @@ shared value types (scores, topologies, evidence views and log arithmetic).
 | --- | --- | --- |
 | Driver | `driver.cpp`, `engine_state.*`, `search_inputs.*`, `execution_config.*` | Registered entry points; compile the per-call snapshot; validate inputs; orchestrate search rounds and collect results. |
 | Visits | `visits.*`, `visit_graph.*`, `scoring.*`, `decisions.*`, `recheck.*`, `message_updates.*`, `graph_traversal.*`, `result_columns.*` | Visit focal individuals, score candidate configurations, choose and accept moves, recheck stale parent pairs, publish message updates and record results. |
-| Scorer | `scorer.*`, `candidate_catalog.h`, `hypothesis_suite.h`, `relationship_topology.h`, `relationship_catalog.h`, `predictive_models.h`, `partition_totals.h`, `panel_*.h`, `*_rejection.h`, `*identity*.h`, `*_moments.h`, `joint_support.h`, `pair_rescue.h` | Build each relationship question as an explicit local pedigree, apply certified rejection bounds, and reduce marker scores to identity, support and rival comparisons. |
-| Pedigree messages | `pedigree_forest.*`, `forest_messages.*`, `message_graph.h`, `indexed_messages.h` | Deterministic spanning forest and stored sum-product genotype messages. |
+| Scorer | `scorer.*`, `candidate_catalog.h`, `hypothesis_suite.h`, `relationship_topology.h`, `relationship_catalog.h`, `joint_identity.h`, `candidate_identity.h`, `predictive_models.h`, `partition_totals.h`, `panel_rejection.h`, `support_rejection.h`, `joint_support.h`, `pair_rescue.h` | Build each relationship question as an explicit local pedigree, reduce marker scores to identity, support and rival comparisons, and certify rejections. Supports are evaluated first, so a configuration that fails support is never scored against rivals. |
+| Pedigree messages | `pedigree_forest.*`, `forest_messages.*` | Deterministic spanning forest and lazily updated sum-product genotype messages. |
 | Numerical core | `plan_compiler.*`, `plan_evaluator.*`, `lane_kernels.*`, `likelihood_core.cpp`, `locus_tables.*`, `locus_workspace.*`, `resource_*.h`, `program_*.h` | Compile each question into a variable-elimination program and evaluate it per locus with vectorized kernels, within explicit memory and work limits. |
-| Screens and life history | `exclusion.cpp`, `genotype_checks.*`, `genotype_support.cpp`, `typed_age.*`, `relative_age_cache.h` | Opposite-homozygote and trio checks, latent Mendelian support, and birth-year intervals propagated through assigned links. |
+| Screens and life history | `exclusion.cpp`, `genotype_checks.*`, `typed_age.*`, `relative_age_cache.h` | Opposite-homozygote and trio checks, and birth-year intervals propagated through assigned links. |
 
 ## Tests
 
