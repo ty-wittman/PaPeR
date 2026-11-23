@@ -3,7 +3,7 @@
 <p class="byline">Tyler Wittman</p>
 <p class="affil">Technical report · PaPeR version 0.1.0 · November 2026 · <a href="https://github.com/ty-wittman/PaPeR">github.com/ty-wittman/PaPeR</a></p>
 
-> **Abstract.** PaPeR assigns genotyped parents to genotyped individuals from multiallelic microhaplotype or biallelic SNP genotypes, together with each individual's sex and birth year. It follows the heuristic search of Sequoia (Huisman 2017): rounds of greedy assignment, in which every candidate parent must beat the alternative relationships by a likelihood-ratio threshold. It computes each of those decisions differently. A decision is an exact likelihood calculation on a small local pedigree: the focal individual, the candidate parents, their already assigned parents and grandparents, and the unobserved individuals that a rival relationship needs. The calculation runs over all $k(k+1)/2$ genotypes of every $k$-allele locus. Evidence from deeper ancestry enters through sum-product genotype messages, computed on a deterministic spanning forest of the current pedigree. Cutting the pedigree's loops to form that forest is the only approximation outside the local pedigree. Genotyping error is modelled by a dropout/foreign-allele process for microhaplotypes, or by Sequoia's model for SNPs, and the error rate is re-estimated from confident trios with a truncated composite likelihood. This report sets out the model, the graph and message-passing machinery, the decision rules, and the genotype and allele coding that make exact local likelihoods fast enough for thousands of individuals and hundreds of multiallelic loci.
+> **Abstract.** PaPeR (Parentage and Pedigree Reconstruction) assigns genotyped parents to genotyped individuals from multiallelic microhaplotype or biallelic SNP genotypes, together with each individual's sex and birth year. It follows the heuristic search of Sequoia (Huisman 2017): rounds of greedy assignment, in which every candidate parent must beat the alternative relationships by a likelihood-ratio threshold. It computes each of those decisions differently. A decision is an exact likelihood calculation on a small local pedigree: the focal individual, the candidate parents, their already assigned parents and grandparents, and the unobserved individuals that a rival relationship needs. The calculation runs over all $k(k+1)/2$ genotypes of every $k$-allele locus. Evidence from deeper ancestry enters through sum-product genotype messages, computed on a deterministic spanning forest of the current pedigree. Cutting the pedigree's loops to form that forest is the only approximation outside the local pedigree. Genotyping error is modelled by a dropout/foreign-allele process for microhaplotypes, or by Sequoia's model for SNPs, and the error rate is re-estimated from confident trios with a truncated composite likelihood. This report sets out the model, the graph and message-passing machinery, the decision rules, and the genotype and allele coding that make exact local likelihoods fast enough for thousands of individuals and hundreds of multiallelic loci.
 
 ## 1. Introduction
 
@@ -18,7 +18,7 @@ PaPeR brings Sequoia's approach to multiallelic markers. It keeps Sequoia's sear
 3. **Messages for deeper ancestry.** Information from more distant relatives enters through sum-product genotype messages on a spanning forest of the current pedigree (Sections 3 and 4). This is the classical peeling computation (Elston and Stewart 1971; Cannings et al. 1978), organized so that each local question can reuse it.
 4. **Calibrated error rates.** The error rate is re-estimated from confident trios, and the search restarts when the data rule out the assumed rate (Section 8).
 
-PaPeR assigns *genotyped* parents only. It does not cluster sibships or create dummy parents for unsampled ones, which Sequoia also does.
+The current release assigns *genotyped* parents. Full pedigree reconstruction, which also clusters sibships and adds dummy parents for unsampled individuals, as Sequoia does, is in active development and is not described here.
 
 This report concentrates on the computational model: the likelihoods, the graph representation of the pedigree and the approximation made at its loops, the message passing, and the genotype and allele coding that makes exact calculation fast. Validation against simulated truth and against Sequoia is summarized in Section 10 and reported in detail in the package's validation document.
 
@@ -87,7 +87,7 @@ which both reduce to $Z=E$ when $k=2$.
 **The dropout/foreign model for microhaplotypes.** Errors in amplicon-sequenced microhaplotypes come mostly from two processes. One allele of a heterozygote can fail to amplify or be under-sampled in the reads, so the call is a false homozygote. Less often, a read error or contamination produces an allele that is not there. PaPeR models these as two mechanisms acting in order, in the spirit of the allelic-dropout and false-allele models used for microsatellites (Wang 2004; Kalinowski et al. 2007):
 
 1. *Dropout*, with probability $D$: a true heterozygote $\lbrace a,b\rbrace$ is read as $\lbrace a,a\rbrace$ or $\lbrace b,b\rbrace$, each with probability $D/2$. Homozygotes are unaffected.
-2. *Foreign alleles*, with probability $F$ per copy: each of the two surviving copies is independently replaced by a draw from a foreign distribution $q$, which by default is the population frequency vector $p$ (so a foreign draw can reproduce the original allele).
+2. *Foreign alleles*, with probability $F$ per copy: each of the two surviving copies is independently replaced by a draw from a foreign distribution $q$, which by default is the population frequency vector $p$ (so a foreign draw can reproduce the original allele). $F$ should be a small positive number, such as $5\times10^{-4}$.
 
 With the per-copy kernel $r(x\to u)=(1-F)[u=x]+F\,q_u$, two precursor copies $\lbrace x,y\rbrace$ produce the unordered call $\lbrace u,v\rbrace$ with probability
 
@@ -437,7 +437,7 @@ $$
 
 PaPeR propagates these constraints through all assigned links, using max-plus relaxation for lower bounds and min-plus relaxation for upper bounds. The stored intervals are therefore the exact feasible ranges given the whole current pedigree. A proposed link is infeasible if it empties an interval or creates a cycle. Only the affected connected component is re-solved for each proposal. The same constraints, solved by Bellman–Ford, decide whether a rival relationship's latent individuals can exist (Section 5.3).
 
-Age is a *hard constraint only*. PaPeR has no age prior, and no age probability enters any likelihood. This is a deliberate difference from Sequoia, which weights relationships by the age difference.
+Age is a *hard constraint only*: PaPeR has no age prior, and no age probability enters any likelihood.
 
 ### 7.4 The search
 
@@ -486,7 +486,7 @@ $$
 
 where $n_{\ell c}$ counts the trio–locus observations in category $c$. Dropout and foreign alleles produce the two kinds of inconsistency in different proportions, so the two categories identify $D$ and $F$ separately. The fit is maximized from three starting points on $[10^{-12},0.25]^2$. Each rate's 95% interval is a profile interval, re-maximizing over the other rate.
 
-Equations (20) and (21) are *composite* likelihoods (Lindsay 1988; Varin et al. 2011). They treat trios as independent, but trios share parents, and they ignore the fact that confident trios were selected using the same data. The intervals are therefore approximate. In blind tests the SNP estimate ran about 11% low, and its nominal 95% interval contained the true rate 54% of the time.
+Equations (20) and (21) are *composite* likelihoods (Lindsay 1988; Varin et al. 2011). They treat trios as independent, but trios share parents, and they ignore the fact that confident trios were selected using the same data. The intervals are therefore approximate. In blind tests the SNP estimate ran about 10% low.
 
 ### 8.4 The guarded policy
 
@@ -557,22 +557,22 @@ The table shows why pairwise likelihoods are not enough for parentage in a pedig
 - During development, rebuilding all messages and plans from scratch reproduced the incrementally maintained values for 2,674 questions to within $3.6\times10^{-12}$, and pruning barren variables changed 916 questions by at most $1.4\times10^{-12}$ (natural-log units). On loop-free pedigrees, message-based questions matched a reference implementation that wrote out the full ancestry explicitly to within $7\times10^{-15}$. That reference has since been removed from the code.
 - For this report, the forest messages were checked again against brute-force enumeration on small loop-free pedigrees (agreement to machine precision), and against small looped pedigrees, where they differ as Section 3.4 describes.
 
-**Accuracy.** On the simulated example data shipped with the package (700 individuals over six birth years, 595 genotyped on 100 microhaplotypes with 3–8 alleles), PaPeR assigns all 387 genotyped dams and 400 genotyped sires, with no wrong assignments. On 150 SNPs of the same individuals it finds 383 dams and 396 sires and makes one wrong assignment. In a 729-condition simulation study (600–2,000 individuals, 100–300 loci, three true and three assumed error rates, and call and individual missingness), PaPeR on microhaplotypes found more parents and made fewer wrong assignments than Sequoia 3.2.0 on SNP panels of the same size in nearly every condition. On the same SNP data, the two programs found about the same number of parents (0.5% fewer for PaPeR) and PaPeR made 22% fewer wrong assignments. The package's validation document gives the full design, results and provenance.
+**Accuracy.** On the simulated example data shipped with the package (700 individuals over six birth years, 595 genotyped on 100 microhaplotypes with 3–8 alleles), PaPeR assigns all 387 genotyped dams and 400 genotyped sires, with no wrong assignments. On 150 SNPs of the same individuals it finds 383 dams and 396 sires and makes one wrong assignment. In a 729-condition simulation study (600–2,000 individuals, 100–300 loci, three true and three assumed error rates, and call and individual missingness), PaPeR on microhaplotypes found more parents and made fewer wrong assignments than Sequoia 3.2.0 on SNP panels of the same size in nearly every condition. On the same SNP data, in blind tests run before error calibration was added (and to be repeated), the two programs found about the same number of parents (0.5% fewer for PaPeR) and PaPeR made 22% fewer wrong assignments. The package's validation document gives the full design, results and provenance.
 
-**Speed.** On one core, the 595-individual example with 100 microhaplotypes runs in about a minute, including final LLRs. PaPeR is slower than Sequoia, because each decision is an exact local likelihood: 20 s against 3 s on 600 individuals, and 102 s against 29 s on 2,000 individuals, in the simulation study's spot checks.
+**Speed.** On one core, the 595-individual example with 100 microhaplotypes runs in about a minute, including final LLRs. PaPeR is generally one to five times slower than Sequoia, depending on data size, because each decision is an exact local likelihood.
 
 ## 11. Limitations and extensions
 
 - **Forest cuts.** Evidence carried around pedigree loops outside the local question is lost at the cut (Section 3.4). Exact alternatives, such as conditioning on loop-breaker genotypes or junction-tree propagation, cost time exponential in the number of loops cut. Iterating messages to a loopy fixed point would make the result depend on update order.
 - **Unlinked loci and panel-wide error rates.** Linkage, linkage disequilibrium and locus-specific error rates are not modelled. Locus-specific rates could be added to the emission tables without changing the rest of the machinery.
 - **Foreign alleles are not recalibrated.** Only Dropout (or the SNP rate) is adjusted. A misstated Foreign rate stays wrong.
-- **Hard age limits.** Ages only rule links in or out. Adding an age prior, as Sequoia does, would make close calls between relatives of different ages sharper.
-- **Genotyped parents only.** Sibship clustering and dummy parents for unsampled individuals would need questions whose explicit individuals are themselves unobserved. The same local-likelihood and message machinery can express them, but PaPeR does not attempt them yet.
+- **Hard age limits.** Ages only rule links in or out. An age prior could sharpen close calls between relatives of different ages.
+- **Genotyped parents only.** The current release does not cluster sibships or add dummy parents for unsampled individuals. Full pedigree reconstruction is in active development. It needs questions whose explicit individuals are themselves unobserved, which the same local-likelihood and message machinery can express.
 - **Pairwise utilities.** Duplicate detection and the search for likely relatives score every pair of individuals and are slow on thousands of samples.
 
 ## Authorship
 
-PaPeR and this report were written by Tyler Wittman together with Claude, an AI model made by Anthropic, used as a coding and writing assistant. The author designed the method, made the modelling decisions, directed the work and ran the validation studies. Much of the code and the first draft of this report were written by Claude under that direction. The description of the implementation was checked against the source code.
+PaPeR was written by Tyler Wittman together with AI coding and documentation assistance (Claude by Anthropic, and OpenAI models). The author set the scientific goals, made the modelling, design and scientific decisions, directed and reviewed the work, and designed and performed the validation studies. Much of the code, tests and documentation were written using AI and reviewed by the author. This report was drafted with Claude from the source code and the project's documentation, and its description of the implementation was checked against the code.
 
 ## References
 

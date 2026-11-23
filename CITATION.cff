@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use PaPeR, please cite it as below, together with Huisman (2017), whose parentage approach PaPeR follows."
 type: software
-title: "PaPeR: Parentage Assignment for Microhaplotype and SNP Markers"
+title: "PaPeR: Parentage and Pedigree Reconstruction Using Multiallelic Markers"
 version: 0.1.0
 date-released: 2026-11-22
 license: MIT

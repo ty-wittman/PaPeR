@@ -2,9 +2,7 @@
 
 This page summarizes the evidence behind PaPeR's defaults: what was tested,
 on which data, and the known limitations. The studies were run by the author
-during development, on simulated pedigrees, with builds whose results were
-checked to be identical to this release (see
-[Code parity](#code-parity-with-this-release)).
+during development, on simulated pedigrees.
 
 ## Scoring
 

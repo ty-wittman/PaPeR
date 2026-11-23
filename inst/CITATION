@@ -1,14 +1,14 @@
 bibentry(
   bibtype = "Manual",
   header = "To cite PaPeR in publications, please use:",
-  title = "{PaPeR}: Parentage Assignment for Microhaplotype and {SNP} Markers",
+  title = "{PaPeR}: Parentage and Pedigree Reconstruction Using Multiallelic Markers",
   author = person("Tyler", "Wittman"),
   year = "2026",
   note = paste("R package version", meta$Version),
   url = "https://github.com/ty-wittman/PaPeR",
   textVersion = paste0(
-    "Wittman, T. (2026). PaPeR: Parentage Assignment for Microhaplotype and ",
-    "SNP Markers. R package version ", meta$Version, ". ",
+    "Wittman, T. (2026). PaPeR: Parentage and Pedigree Reconstruction Using ",
+    "Multiallelic Markers. R package version ", meta$Version, ". ",
     "https://github.com/ty-wittman/PaPeR")
 )
 
